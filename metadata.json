@@ -1,0 +1,8 @@
+{
+  "name": "Laptop AI Assistant",
+  "description": "A real-time, multimodal AI assistant that discovers your laptop details and helps you in your native language using Gemini Live API.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
