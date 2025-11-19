@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stare Detection - Face Only</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        #console {
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="console">Starting Stare Detection System...</div>
+
+    <!-- Load TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+
+    <script>
+        class StareDetector {
+            constructor() {
+                this.stareStartTime = null;
+                this.stareThreshold = 3; // 3 seconds
+                this.isDetected = false;
+                this.model = null;
+                this.video = null;
+                this.videoStream = null;
+                this.detectionInterval = null;
+                this.isDetectionActive = false;
+                this.console = document.getElementById('console');
+            }
+
+            log(message) {
+                this.console.innerHTML += message + '\n';
+                this.console.scrollTop = this.console.scrollHeight;
+                console.log(message);
+            }
+
+            async initialize() {
+                this.log("🚀 Initializing Stare Detection System...");
+
+                try {
+                    this.log("📦 Loading face detection model...");
+
+                    this.model = await faceLandmarksDetection.load(
+                        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+                        { maxFaces: 1 }
+                    );
+
+                    this.log("✅ Face detection model loaded!");
+
+                    this.video = document.createElement('video');
+                    this.video.width = 640;
+                    this.video.height = 480;
+                    this.video.autoplay = true;
+                    this.video.playsinline = true;
+                    this.video.muted = true;
+                    this.video.style.display = 'none';
+
+                    return true;
+
+                } catch (error) {
+                    this.log("❌ Initialization error: " + error);
+                    return false;
+                }
+            }
+
+            async startDetection() {
+                if (this.isDetectionActive) {
+                    this.log("⚠️ Detection already running.");
+                    return;
+                }
+
+                try {
+                    this.log("📷 Starting camera...");
+
+                    this.videoStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            facingMode: "user"
+                        }
+                    });
+
+                    this.video.srcObject = this.videoStream;
+
+                    await new Promise((resolve) => {
+                        this.video.onloadedmetadata = () => {
+                            this.video.play();
+                            resolve();
+                        };
+                    });
+
+                    this.isDetectionActive = true;
+                    this.log("✅ Camera enabled. Face detection started...");
+                    this.log("👁️ Look straight at the camera for 3 seconds...");
+                    this.log("⏳ Timer starts when face is centered");
+
+                    this.detectionInterval = setInterval(async () => {
+                        await this.detectStare();
+                    }, 100);
+
+                } catch (error) {
+                    this.log("❌ Error accessing camera: " + error);
+                    if (error.name === "NotAllowedError") {
+                        this.log("🔒 Please allow camera access.");
+                    }
+                    this.cleanup();
+                }
+            }
+
+            async detectStare() {
+                if (!this.isDetectionActive || !this.model) return;
+
+                try {
+                    const predictions = await this.model.estimateFaces({
+                        input: this.video,
+                        returnTensors: false,
+                        flipHorizontal: false,
+                        predictIrises: false // 👈 NO eye detection
+                    });
+
+                    if (predictions.length > 0) {
+                        const face = predictions[0];
+                        const box = face.boundingBox;
+
+                        const x1 = box.topLeft[0];
+                        const x2 = box.bottomRight[0];
+                        const faceCenterX = (x1 + x2) / 2;
+                        const faceWidth = x2 - x1;
+
+                        const frameCenterX = this.video.videoWidth / 2;
+
+                        const offset = Math.abs(faceCenterX - frameCenterX);
+                        const allowedOffset = faceWidth * 0.30;
+
+                        // FACE IS CENTERED
+                        if (offset < allowedOffset) {
+                            const now = Date.now();
+
+                            if (this.stareStartTime === null) {
+                                this.stareStartTime = now;
+                                this.log("🎯 Face centered — Timer started...");
+                            } else {
+                                const duration = ((now - this.stareStartTime) / 1000).toFixed(1);
+
+                                // Update last line
+                                const lines = this.console.innerHTML.split("\n");
+                                lines[lines.length - 1] = `⏳ Holding face steady... ${duration}s / ${this.stareThreshold}s`;
+                                this.console.innerHTML = lines.join("\n");
+                                this.console.scrollTop = this.console.scrollHeight;
+
+                                if (duration >= this.stareThreshold && !this.isDetected) {
+                                    this.isDetected = true;
+                                    this.stareDetected();
+                                }
+                            }
+                        } else {
+                            if (this.stareStartTime !== null) {
+                                this.log("↩️ Face moved — Timer Reset");
+                                this.stareStartTime = null;
+                            }
+                        }
+                    } else {
+                        if (this.stareStartTime !== null) {
+                            this.log("❌ No face detected — Timer Reset");
+                            this.stareStartTime = null;
+                        }
+                    }
+
+                } catch (error) {
+                    this.log("⚠️ Detection error: " + error);
+                }
+            }
+
+            stareDetected() {
+                this.log("\n✅ STARE DETECTED! Face held centered for 3 seconds.");
+                this.log("🚀 Stopping camera and cleaning resources...");
+                this.cleanup();
+            }
+
+            stopDetection() {
+                this.log("\n🛑 Manual Stop (ESC Pressed)");
+                this.cleanup();
+            }
+
+            cleanup() {
+                this.isDetectionActive = false;
+
+                if (this.detectionInterval) {
+                    clearInterval(this.detectionInterval);
+                    this.detectionInterval = null;
+                }
+
+                if (this.videoStream) {
+                    this.videoStream.getTracks().forEach(track => track.stop());
+                    this.videoStream = null;
+                }
+
+                if (this.video) {
+                    this.video.srcObject = null;
+                }
+
+                this.stareStartTime = null;
+
+                this.log("✅ Resources cleaned. Camera turned off.");
+            }
+        }
+
+        async function main() {
+            const detector = new StareDetector();
+            const ok = await detector.initialize();
+
+            if (!ok) {
+                detector.log("❌ Failed to initialize system");
+                return;
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape") detector.stopDetection();
+            });
+
+            detector.log("\nPress ESC anytime to stop.\n");
+
+            await detector.startDetection();
+        }
+
+        async function loadAndStart() {
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.min.js";
+            script.onload = main;
+            document.head.appendChild(script);
+        }
+
+        document.addEventListener("DOMContentLoaded", loadAndStart);
+    </script>
+</body>
+</html>

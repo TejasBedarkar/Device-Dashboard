@@ -10,9 +10,9 @@
       "DOM.Iterable"
     ],
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    /* "types": ["node"] was here. It has been REMOVED 
+      to allow auto-detection of all types in node_modules.
+    */
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",

@@ -1,0 +1,34 @@
+{
+  "from_scan": {
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12500H",
+    "ram": "15.63 GB",
+    "gpu": "Intel(R) Iris(R) Xe Graphics, NVIDIA GeForce RTX 3050 Laptop GPU",
+    "model": "ASUS TUF Gaming F17 FX707ZC",
+    "manufacturer": "ASUSTeK COMPUTER INC.",
+    "os": "win32"
+  },
+  "specifications": {
+    "laptop_model": "ASUS TUF Gaming F17 FX707ZC",
+    "brand": "ASUS",
+    "series": "TUF Gaming",
+    "release_year": "2022",
+    "cpu": "12th Gen Intel Core i5-12500H",
+    "gpu": "Intel Iris Xe Graphics, NVIDIA GeForce RTX 3050 Laptop GPU",
+    "ram_options": "16GB DDR4",
+    "max_ram_supported": "32GB",
+    "storage_options": "512GB PCIe NVMe M.2 SSD",
+    "display": "17.3-inch, FHD (1920 x 1080), 144Hz, IPS-level",
+    "battery": "48WHrs, 3S1P, 3-cell Li-ion",
+    "weight": "2.6 kg (5.73 lbs)",
+    "dimensions": "399 x 269 x 24.9 mm (15.71 x 10.59 x 0.98 inches)",
+    "ports": "1x Thunderbolt 4, 1x USB 3.2 Gen 1 Type-C, 2x USB 3.2 Gen 1 Type-A, 1x HDMI 2.0b, 1x RJ-45, 1x 3.5mm Combo Audio Jack",
+    "os": "Windows 11 Home",
+    "connectivity": "Wi-Fi 6(802.11ax) + Bluetooth 5.2",
+    "webcam": "720p HD camera",
+    "keyboard": "Backlit Chiclet Keyboard RGB",
+    "build_quality": "MIL-STD-810H military standard",
+    "typical_price_range": "$1,000 - $1,200"
+  },
+  "error": null,
+  "timestamp": "2025-11-17 18:54:15"
+}

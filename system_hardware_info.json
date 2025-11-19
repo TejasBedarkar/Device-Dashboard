@@ -1,0 +1,32 @@
+{
+  "system_info": {
+    "hostname": "LAPTOP-7NIBKP9K",
+    "os_type": "Windows_NT",
+    "os_platform": "win32",
+    "os_release": "10.0.26100",
+    "architecture": "x64",
+    "cpu": {
+      "model": "12th Gen Intel(R) Core(TM) i5-12500H",
+      "cores": 16,
+      "speed_mhz": 3110
+    },
+    "ram": {
+      "total_gb": "15.63",
+      "free_gb": "3.55",
+      "used_gb": "12.08"
+    },
+    "gpus": [
+      "Intel(R) Iris(R) Xe Graphics",
+      "NVIDIA GeForce RTX 3050 Laptop GPU"
+    ],
+    "manufacturer": "ASUSTeK COMPUTER INC.",
+    "model": "ASUS TUF Gaming F17 FX707ZC"
+  },
+  "browser_info": {
+    "selenium_available": true,
+    "hardwareConcurrency": 16,
+    "platform": "Win32",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/142.0.0.0 Safari/537.36"
+  },
+  "collected_at": "2025-11-17 18:54:06"
+}
